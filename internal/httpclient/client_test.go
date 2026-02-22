@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -90,5 +91,61 @@ func TestPrepareMethodQueryBodyTypedFieldTypes(t *testing.T) {
 	}
 	if value, ok := decoded["nothing"]; !ok || value != nil {
 		t.Fatalf("nothing = %#v (ok=%t); want nil", value, ok)
+	}
+}
+
+func TestSelectJSONFieldsFromDataList(t *testing.T) {
+	payload := []byte(`{"data":[{"slug":"a","name":"n","id":"1"}]}`)
+
+	filtered, err := selectJSONFields(payload, []string{"slug,name"})
+	if err != nil {
+		t.Fatalf("select fields: %v", err)
+	}
+
+	var rows []map[string]any
+	if err := json.Unmarshal(filtered, &rows); err != nil {
+		t.Fatalf("decode filtered: %v", err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("rows length = %d; want 1", len(rows))
+	}
+	if rows[0]["slug"] != "a" || rows[0]["name"] != "n" {
+		t.Fatalf("unexpected row: %#v", rows[0])
+	}
+	if _, ok := rows[0]["id"]; ok {
+		t.Fatalf("unexpected id in filtered row: %#v", rows[0])
+	}
+}
+
+func TestSelectJSONFieldsFromDataObject(t *testing.T) {
+	payload := []byte(`{"data":{"slug":"a","name":"n","id":"1"}}`)
+
+	filtered, err := selectJSONFields(payload, []string{"slug,name"})
+	if err != nil {
+		t.Fatalf("select fields: %v", err)
+	}
+
+	var object map[string]any
+	if err := json.Unmarshal(filtered, &object); err != nil {
+		t.Fatalf("decode filtered: %v", err)
+	}
+
+	if object["slug"] != "a" || object["name"] != "n" {
+		t.Fatalf("unexpected object: %#v", object)
+	}
+	if _, ok := object["id"]; ok {
+		t.Fatalf("unexpected id in filtered object: %#v", object)
+	}
+}
+
+func TestApplyTemplate(t *testing.T) {
+	payload := []byte(`[{"slug":"a","name":"n"}]`)
+
+	rendered, err := applyTemplate(`{{range .}}{{.slug}}:{{.name}}{{"\n"}}{{end}}`, payload)
+	if err != nil {
+		t.Fatalf("apply template: %v", err)
+	}
+	if strings.TrimSpace(string(rendered)) != "a:n" {
+		t.Fatalf("unexpected rendered template: %q", string(rendered))
 	}
 }

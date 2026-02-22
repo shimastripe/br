@@ -44,9 +44,17 @@ func TestBuildOperationsFromSpec(t *testing.T) {
 	}
 
 	seenByTag := map[string]map[string]bool{}
+	foundAddonsList := false
+	foundAddonsShow := false
 	for _, op := range ops {
 		if op.OperationID == "secret-upsert" || op.OperationID == "secret-value-get" {
 			t.Fatalf("deprecated operation %q should not be generated", op.OperationID)
+		}
+		if op.Method == "GET" && !op.SupportsJSON {
+			t.Fatalf("GET operation %q should support --json", op.OperationID)
+		}
+		if op.Method != "GET" && op.SupportsJSON {
+			t.Fatalf("non-GET operation %q should not support --json", op.OperationID)
 		}
 		if seenByTag[op.Tag] == nil {
 			seenByTag[op.Tag] = map[string]bool{}
@@ -55,5 +63,34 @@ func TestBuildOperationsFromSpec(t *testing.T) {
 			t.Fatalf("duplicate command name %q under tag %q", op.Name, op.Tag)
 		}
 		seenByTag[op.Tag][op.Name] = true
+
+		if op.OperationID == "addons-list" {
+			foundAddonsList = true
+			if !containsField(op.JSONFields, "id") {
+				t.Fatalf("addons-list JSON fields should include id, got %v", op.JSONFields)
+			}
+		}
+		if op.OperationID == "addons-show" {
+			foundAddonsShow = true
+			if !containsField(op.JSONFields, "id") {
+				t.Fatalf("addons-show JSON fields should include id, got %v", op.JSONFields)
+			}
+		}
 	}
+
+	if !foundAddonsList {
+		t.Fatal("addons-list operation not found")
+	}
+	if !foundAddonsShow {
+		t.Fatal("addons-show operation not found")
+	}
+}
+
+func containsField(fields []string, expected string) bool {
+	for _, field := range fields {
+		if field == expected {
+			return true
+		}
+	}
+	return false
 }

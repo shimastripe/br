@@ -18,16 +18,31 @@ const (
 )
 
 type swaggerSpec struct {
-	Paths map[string]map[string]swaggerOperation `json:"paths"`
+	Paths       map[string]map[string]swaggerOperation `json:"paths"`
+	Definitions map[string]swaggerSchema               `json:"definitions"`
 }
 
 type swaggerOperation struct {
-	OperationID string         `json:"operationId"`
-	Summary     string         `json:"summary"`
+	OperationID string                     `json:"operationId"`
+	Summary     string                     `json:"summary"`
+	Description string                     `json:"description"`
+	Tags        []string                   `json:"tags"`
+	Deprecated  bool                       `json:"deprecated"`
+	Parameters  []swaggerParam             `json:"parameters"`
+	Responses   map[string]swaggerResponse `json:"responses"`
+}
+
+type swaggerResponse struct {
 	Description string         `json:"description"`
-	Tags        []string       `json:"tags"`
-	Deprecated  bool           `json:"deprecated"`
-	Parameters  []swaggerParam `json:"parameters"`
+	Schema      *swaggerSchema `json:"schema"`
+}
+
+type swaggerSchema struct {
+	Ref        string                   `json:"$ref"`
+	Type       string                   `json:"type"`
+	Properties map[string]swaggerSchema `json:"properties"`
+	Items      *swaggerSchema           `json:"items"`
+	AllOf      []swaggerSchema          `json:"allOf"`
 }
 
 type swaggerParam struct {
@@ -48,6 +63,8 @@ type operation struct {
 	Summary      string
 	Description  string
 	BodyRequired bool
+	SupportsJSON bool
+	JSONFields   []string
 	Params       []param
 }
 
@@ -134,6 +151,13 @@ func buildOperations(spec *swaggerSpec) ([]operation, error) {
 				opID = fallbackOperationID(strings.ToUpper(method), path)
 			}
 
+			methodUpper := strings.ToUpper(method)
+			supportsJSON := methodUpper == "GET"
+			jsonFields := []string(nil)
+			if supportsJSON {
+				jsonFields = extractJSONFields(spec, op)
+			}
+
 			for _, tag := range op.Tags {
 				tag = strings.TrimSpace(tag)
 				if tag == "" {
@@ -168,11 +192,13 @@ func buildOperations(spec *swaggerSpec) ([]operation, error) {
 					Tag:          tag,
 					Name:         deriveSubcommandName(tag, opID),
 					OperationID:  opID,
-					Method:       strings.ToUpper(method),
+					Method:       methodUpper,
 					Path:         path,
 					Summary:      strings.TrimSpace(op.Summary),
 					Description:  strings.TrimSpace(op.Description),
 					BodyRequired: bodyRequired,
+					SupportsJSON: supportsJSON,
+					JSONFields:   jsonFields,
 					Params:       params,
 				})
 			}
@@ -196,6 +222,161 @@ func buildOperations(spec *swaggerSpec) ([]operation, error) {
 	})
 
 	return operations, nil
+}
+
+func extractJSONFields(spec *swaggerSpec, op swaggerOperation) []string {
+	schema, ok := findSuccessSchema(op.Responses)
+	if !ok {
+		return nil
+	}
+
+	projected := projectResponseSchema(spec, *schema)
+	fields := topLevelObjectFields(spec, projected)
+	if len(fields) > 0 {
+		return fields
+	}
+
+	// Fallback to root object fields when projection does not expose field names.
+	return topLevelObjectFields(spec, *schema)
+}
+
+func findSuccessSchema(responses map[string]swaggerResponse) (*swaggerSchema, bool) {
+	if len(responses) == 0 {
+		return nil, false
+	}
+
+	statuses := make([]string, 0, len(responses))
+	for status := range responses {
+		if strings.HasPrefix(strings.TrimSpace(status), "2") {
+			statuses = append(statuses, status)
+		}
+	}
+	sort.Strings(statuses)
+
+	for _, status := range statuses {
+		response := responses[status]
+		if response.Schema != nil {
+			return response.Schema, true
+		}
+	}
+	return nil, false
+}
+
+func projectResponseSchema(spec *swaggerSpec, schema swaggerSchema) swaggerSchema {
+	resolved := resolveSchema(spec, schema, map[string]bool{})
+	if isObjectSchema(resolved) {
+		if dataSchema, ok := resolved.Properties["data"]; ok {
+			dataResolved := resolveSchema(spec, dataSchema, map[string]bool{})
+			if isArraySchema(dataResolved) && dataResolved.Items != nil {
+				itemResolved := resolveSchema(spec, *dataResolved.Items, map[string]bool{})
+				if isObjectSchema(itemResolved) {
+					return itemResolved
+				}
+			}
+			if isObjectSchema(dataResolved) {
+				return dataResolved
+			}
+		}
+		return resolved
+	}
+
+	if isArraySchema(resolved) && resolved.Items != nil {
+		itemResolved := resolveSchema(spec, *resolved.Items, map[string]bool{})
+		if isObjectSchema(itemResolved) {
+			return itemResolved
+		}
+	}
+
+	return resolved
+}
+
+func topLevelObjectFields(spec *swaggerSpec, schema swaggerSchema) []string {
+	resolved := resolveSchema(spec, schema, map[string]bool{})
+	if !isObjectSchema(resolved) {
+		return nil
+	}
+
+	fields := make([]string, 0, len(resolved.Properties))
+	for key := range resolved.Properties {
+		fields = append(fields, key)
+	}
+	sort.Strings(fields)
+	return fields
+}
+
+func resolveSchema(spec *swaggerSpec, schema swaggerSchema, seen map[string]bool) swaggerSchema {
+	if seen == nil {
+		seen = map[string]bool{}
+	}
+	resolved := schema
+
+	ref := strings.TrimSpace(resolved.Ref)
+	if ref != "" {
+		defName := strings.TrimPrefix(ref, "#/definitions/")
+		if defName == "" {
+			return swaggerSchema{}
+		}
+		if seen[defName] {
+			return swaggerSchema{}
+		}
+		definition, ok := spec.Definitions[defName]
+		if !ok {
+			return swaggerSchema{}
+		}
+		seen[defName] = true
+		defer delete(seen, defName)
+		resolved = resolveSchema(spec, definition, seen)
+	}
+
+	if len(resolved.AllOf) > 0 {
+		merged := swaggerSchema{}
+		for _, part := range resolved.AllOf {
+			merged = mergeSchemas(merged, resolveSchema(spec, part, seen))
+		}
+		own := swaggerSchema{
+			Type:       resolved.Type,
+			Properties: resolved.Properties,
+			Items:      resolved.Items,
+		}
+		resolved = mergeSchemas(merged, own)
+	}
+
+	return resolved
+}
+
+func mergeSchemas(base swaggerSchema, add swaggerSchema) swaggerSchema {
+	merged := swaggerSchema{
+		Type:       base.Type,
+		Properties: map[string]swaggerSchema{},
+		Items:      base.Items,
+	}
+
+	for key, value := range base.Properties {
+		merged.Properties[key] = value
+	}
+	for key, value := range add.Properties {
+		merged.Properties[key] = value
+	}
+
+	if strings.TrimSpace(add.Type) != "" {
+		merged.Type = add.Type
+	}
+	if add.Items != nil {
+		merged.Items = add.Items
+	}
+	if len(merged.Properties) == 0 {
+		merged.Properties = nil
+	}
+
+	return merged
+}
+
+func isObjectSchema(schema swaggerSchema) bool {
+	return strings.EqualFold(schema.Type, "object") || len(schema.Properties) > 0
+}
+
+func isArraySchema(schema swaggerSchema) bool {
+	return strings.EqualFold(schema.Type, "array") || schema.Items != nil
 }
 
 func assignUniqueNames(operations []operation) {
@@ -324,6 +505,15 @@ func renderGeneratedFile(operations []operation) ([]byte, error) {
 			buf.WriteString(fmt.Sprintf("\t\t\t\tSummary: %q,\n", op.Summary))
 			buf.WriteString(fmt.Sprintf("\t\t\t\tDescription: %q,\n", op.Description))
 			buf.WriteString(fmt.Sprintf("\t\t\t\tBodyRequired: %t,\n", op.BodyRequired))
+			buf.WriteString(fmt.Sprintf("\t\t\t\tSupportsJSON: %t,\n", op.SupportsJSON))
+			buf.WriteString("\t\t\t\tJSONFields: []string{")
+			for i, field := range op.JSONFields {
+				if i > 0 {
+					buf.WriteString(", ")
+				}
+				buf.WriteString(fmt.Sprintf("%q", field))
+			}
+			buf.WriteString("},\n")
 			buf.WriteString("\t\t\t\tParams: []ParamSpec{\n")
 			for _, p := range op.Params {
 				buf.WriteString("\t\t\t\t\t{\n")

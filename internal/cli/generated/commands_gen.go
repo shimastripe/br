@@ -16,6 +16,8 @@ var Tags = []TagSpec{
 				Summary:      "Get list of Bitrise activity events",
 				Description:  "List all the Bitrise activity events",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"created_at", "description", "event_icon", "event_stype", "repository_avatar_icon_url", "repository_title", "slug", "target_path_string", "title"},
 				Params: []ParamSpec{
 					{
 						Name:        "limit",
@@ -46,6 +48,8 @@ var Tags = []TagSpec{
 				Summary:      "Get list of available Bitrise addons",
 				Description:  "List all the available Bitrise addons",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"banner_image", "card_header_colors", "categories", "description", "developer_links", "documentation_url", "has_ui", "icon", "id", "is_beta", "plans", "platforms", "preview_images", "setup_guide", "subtitle", "summary", "title"},
 				Params:       []ParamSpec{},
 			},
 			{
@@ -56,6 +60,8 @@ var Tags = []TagSpec{
 				Summary:      "Get list of the addons for apps",
 				Description:  "List all the provisioned addons for the authorized apps",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"description", "documentation_url", "has_ui", "icon", "id", "is_beta", "is_enabled", "login_url", "plan", "scopes", "setup_guide", "summary", "terms_url", "title"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -74,6 +80,8 @@ var Tags = []TagSpec{
 				Summary:      "Get list of the addons for organization",
 				Description:  "List all the provisioned addons for organization",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"apps", "documentation_url", "has_ui", "icon", "id", "is_beta", "summary", "title"},
 				Params: []ParamSpec{
 					{
 						Name:        "organization-slug",
@@ -92,6 +100,8 @@ var Tags = []TagSpec{
 				Summary:      "Get list of the addons for user",
 				Description:  "List all the provisioned addons for the authenticated user",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"apps", "documentation_url", "has_ui", "icon", "id", "is_beta", "summary", "title"},
 				Params: []ParamSpec{
 					{
 						Name:        "user-slug",
@@ -110,6 +120,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a specific Bitrise addon",
 				Description:  "Show details of a specific Bitrise addon",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"banner_image", "card_header_colors", "categories", "description", "developer_links", "documentation_url", "has_ui", "icon", "id", "is_beta", "plans", "platforms", "preview_images", "setup_guide", "subtitle", "summary", "title"},
 				Params: []ParamSpec{
 					{
 						Name:        "addon-id",
@@ -133,6 +145,8 @@ var Tags = []TagSpec{
 				Summary:      "Confirm an android keystore file upload",
 				Description:  "This is the last step of uploading an android keystore file to Bitrise. Confirm the android keystore file upload and view the file on the Code Signing tab of a specific app. Read more in our [Confirming the upload](https://devcenter.bitrise.io/api/managing-files-in-generic-file-storage/#confirming-the-file-upload) guide.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "android-keystore-file-slug",
@@ -158,6 +172,8 @@ var Tags = []TagSpec{
 				Summary:      "Create an Android keystore file",
 				Description:  "Add a new Android keystore file to an app. `keystore_file_name` is required if there is already an existing keystore file for the app. It will determine the environment variable key to be used to refer to the keystore file in builds. E.g. `BITRISE_ANDROID_KEYSTORE_<keystore_file_name>_URL`. The `keystore_file_name` can only contain letters, numbers, and underscores.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "android-keystore-file",
@@ -183,6 +199,8 @@ var Tags = []TagSpec{
 				Summary:      "Delete an android keystore file",
 				Description:  "Delete an app's android keystore file. You can fetch an app's android keystore file slug if you first list all the uploaded files with the [GET /apps/{app-slug}/android-keystore-files](https://api-docs.bitrise.io/#/android-keystore-file/android-keystore-file-list) endpoint. Read more in our [Deleting a file](https://devcenter.bitrise.io/api/managing-android-keystore-files.html) guide.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "android-keystore-file-slug",
@@ -208,6 +226,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a list of the android keystore files",
 				Description:  "List all the android keystore files that have been uploaded to a specific app.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"exposed_meta_datastore", "is_expose", "is_protected", "processed", "slug", "upload_file_name", "upload_file_size", "user_env_key"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -240,6 +260,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a specific Android Keystore file",
 				Description:  "Retrieve data of a specific Android Keystore file to check its attributes.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"download_url", "exposed_meta_datastore", "is_expose", "is_protected", "processed", "slug", "upload_file_name", "upload_file_size", "user_env_key"},
 				Params: []ParamSpec{
 					{
 						Name:        "android-keystore-file-slug",
@@ -270,6 +292,8 @@ var Tags = []TagSpec{
 				Summary:      "Upload a new bitrise.yml for your application.",
 				Description:  "Upload a new bitrise.yml for your application.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-config",
@@ -295,6 +319,8 @@ var Tags = []TagSpec{
 				Summary:      "Add a new app",
 				Description:  "Add a new app to Bitrise. This is the first step of the app registration process. To successfully set it up, you need to provide the required app parameters: the repository URL and the isPublic field. Read more about the app creation process in our [detailed guide](https://devcenter.bitrise.io/api/adding-and-managing-apps/#adding-a-new-app).",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app",
@@ -313,6 +339,8 @@ var Tags = []TagSpec{
 				Summary:      "Save the application at the end of the app registration process",
 				Description:  "Save the application after registering it on Bitrise and registering an SSH key (and, optionally, adding a webhook). With this endpoint you can define the initial configuration, define application-level environment variables, determine the project type, and set an Organization to be the owner of the app. Read more about the app registration process in our [detailed guide](https://devcenter.bitrise.io/api/adding-and-managing-apps/#adding-a-new-app).",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app",
@@ -338,6 +366,8 @@ var Tags = []TagSpec{
 				Summary:      "Register an incoming webhook for a specific application",
 				Description:  "[Register an incoming webhook](https://devcenter.bitrise.io/api/incoming-and-outgoing-webhooks/#incoming-webhooks) for a specific application. You can do this during the app registration process or at any other time in an app's life. When calling this endpoint, a webhook is registered at your git provider: this is necessary to automatically trigger builds on Bitrise.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -356,6 +386,8 @@ var Tags = []TagSpec{
 				Summary:      "Getting the location of the application's bitrise.yaml",
 				Description:  "Getting the location of the application's bitrise.yaml. Requires administrator level privileges to the app.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"location"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -374,6 +406,8 @@ var Tags = []TagSpec{
 				Summary:      "Changing the location of the application's bitrise.yaml",
 				Description:  "Changing the location of the application's bitrise.yaml. Requires administrator level privileges to the app.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app",
@@ -399,6 +433,8 @@ var Tags = []TagSpec{
 				Summary:      "Add an SSH-key to a specific app",
 				Description:  "Add an SSH-key to a specific app. After creating an app, you need to register the SSH key so that Bitrise will be able to access and clone your repository during the build process. This requires the app slug of your newly created app.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "ssh-key",
@@ -429,6 +465,8 @@ var Tags = []TagSpec{
 				Summary:      "List Apple API credentials for a specific user",
 				Description:  "List Apple API credentials for a specific Bitrise user",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"created_at", "is_enterprise_account", "issuer_id", "key_id", "name", "slug", "updated_at"},
 				Params: []ParamSpec{
 					{
 						Name:        "user-slug",
@@ -447,6 +485,8 @@ var Tags = []TagSpec{
 				Summary:      "Create Apple API Credential",
 				Description:  "Creates a new Apple API Credential with the given data.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "types",
@@ -472,6 +512,8 @@ var Tags = []TagSpec{
 				Summary:      "Delete Apple API Credential",
 				Description:  "Removes the Apple API Credential with the identifier.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "org-slug",
@@ -490,6 +532,8 @@ var Tags = []TagSpec{
 				Summary:      "List Apple API credentials for a specific organization",
 				Description:  "List Apple API credentials for a specific Bitrise Workspace",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"created_at", "is_enterprise_account", "issuer_id", "key_id", "name", "slug", "updated_at"},
 				Params: []ParamSpec{
 					{
 						Name:        "org-slug",
@@ -513,6 +557,8 @@ var Tags = []TagSpec{
 				Summary:      "Change the connection type of an app",
 				Description:  "Change the connection type of an app",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "connection",
@@ -538,6 +584,8 @@ var Tags = []TagSpec{
 				Summary:      "Change Github app connection configuration of an app",
 				Description:  "Change Github app connection configuration of an app",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "connection",
@@ -563,6 +611,8 @@ var Tags = []TagSpec{
 				Summary:      "Change the linked repositories of a Github app connection",
 				Description:  "Change the linked repositories of a Github app connection",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "linked-repositories",
@@ -588,6 +638,8 @@ var Tags = []TagSpec{
 				Summary:      "Get bitrise.yml of a specific app",
 				Description:  "Get the full `bitrise.yml` configuration of an application, by providing the app slug. It returns the current `bitrise.yml` that is stored on bitrise.io in full, including the trigger map, the different workflows and the Steps.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -606,6 +658,8 @@ var Tags = []TagSpec{
 				Summary:      "Deletes an app",
 				Description:  "Deletes an app by slug. Use with care, make sure you really want to delete the app. This action cannot be undone.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -624,6 +678,8 @@ var Tags = []TagSpec{
 				Summary:      "Get list of the apps",
 				Description:  "List all the apps available for the authenticated account, including those that are owned by other users or Organizations.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"avatar_url", "is_disabled", "is_github_checks_enabled", "is_public", "owner", "project_id", "project_type", "provider", "repo_owner", "repo_slug", "repo_url", "slug", "status", "title"},
 				Params: []ParamSpec{
 					{
 						Name:        "limit",
@@ -670,6 +726,8 @@ var Tags = []TagSpec{
 				Summary:      "Get list of the apps for an organization",
 				Description:  "List all the available apps owned by a given organization. [Find the organization URL](https://devcenter.bitrise.io/team-management/organizations/org-url/) of the organisations you are part of; be aware that the endpoint will not return any apps if the authenticated account is not a member of the given organisation.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"avatar_url", "is_disabled", "is_github_checks_enabled", "is_public", "owner", "project_id", "project_type", "provider", "repo_owner", "repo_slug", "repo_url", "slug", "status", "title"},
 				Params: []ParamSpec{
 					{
 						Name:        "org-slug",
@@ -723,6 +781,8 @@ var Tags = []TagSpec{
 				Summary:      "Get list of the apps for a user",
 				Description:  "List all the available apps for the given user.  It needs the user slug that you can get from the [GET /me](https://api-docs.bitrise.io/#/user/user-profile) endpoint.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"avatar_url", "is_disabled", "is_github_checks_enabled", "is_public", "owner", "project_id", "project_type", "provider", "repo_owner", "repo_slug", "repo_url", "slug", "status", "title"},
 				Params: []ParamSpec{
 					{
 						Name:        "user-slug",
@@ -776,6 +836,8 @@ var Tags = []TagSpec{
 				Summary:      "Updates the app's notification settings",
 				Description:  "Updates the app's email notification settings with parameters",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "notification_settings_params",
@@ -801,6 +863,8 @@ var Tags = []TagSpec{
 				Summary:      "Remove repository authorization of an app",
 				Description:  "Remove repository authorization of an app",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -819,6 +883,8 @@ var Tags = []TagSpec{
 				Summary:      "Remove service credential user of an app",
 				Description:  "Remove service credential user of an app",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -837,6 +903,8 @@ var Tags = []TagSpec{
 				Summary:      "Lists group roles for an app",
 				Description:  "",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"groups"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -862,6 +930,8 @@ var Tags = []TagSpec{
 				Summary:      "Replaces group roles for an app",
 				Description:  "Replaces the groups for a given role on an app. Only the given groups will be present for a role on the app after this call.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "groups",
@@ -894,6 +964,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a specific app",
 				Description:  "Get the details of a specific app by providing the app slug. You can get the app slug by calling the [/apps](https://api-docs.bitrise.io/#/application/app-list) endpoint or by opening the app on bitrise.io and copying the slug from the URL.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"avatar_url", "is_disabled", "is_github_checks_enabled", "is_public", "owner", "project_id", "project_type", "provider", "repo_owner", "repo_slug", "repo_url", "slug", "status", "title"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -912,6 +984,8 @@ var Tags = []TagSpec{
 				Summary:      "Updates an app",
 				Description:  "Updates an app by slug. Only updates the fields specified in the body.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app",
@@ -937,6 +1011,8 @@ var Tags = []TagSpec{
 				Summary:      "List the branches with existing builds of an app's repository",
 				Description:  "Lists only those branches of a specified Bitrise app that have existing builds.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"data"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -960,6 +1036,8 @@ var Tags = []TagSpec{
 				Summary:      "Delete a build artifact",
 				Description:  "Delete a build artifact of an app's build. The required parameters are app slug, build slug and artifact slug. You can fetch the build artifact slug if you first list all build artifacts of an app with the [/apps/](https://api-docs.bitrise.io/#/build-artifact/artifact-list) endpoint.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -992,6 +1070,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a list of all build artifacts",
 				Description:  "List all build artifacts that have been generated for an app's build. This endpoint can retrieve artifacts from the archive as well. You can use the created build artifact slugs from the response output to retrieve data of a specific build artifact with the [GET/apps/](https://api-docs.bitrise.io/#/build-artifact/artifact-show) endpoint or update a build artifact with the [PATCH/apps](https://api-docs.bitrise.io/#/build-artifact/artifact-update) endpoint.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"artifact_meta", "artifact_type", "file_size_bytes", "intermediate_file_info", "is_public_page_enabled", "slug", "title"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1031,6 +1111,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a specific build artifact",
 				Description:  "Retrieve data of a specific build artifact. The endpoint can retrieve archived artifacts as well. The response output contains a time-limited download url (expires in 10 minutes) and a public install-page URL. You can view the build artifact with both URLs, but the public install-page url will not work unless you [enable it](https://devcenter.bitrise.io/tutorials/deploy/bitrise-app-deployment/#enabling-public-page-for-the-app).",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"artifact_meta", "artifact_type", "expiring_download_url", "file_size_bytes", "intermediate_file_info", "is_public_page_enabled", "public_install_page_url", "slug", "title"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1070,6 +1152,8 @@ var Tags = []TagSpec{
 				Summary:      "Update a build artifact",
 				Description:  "Update the `is_public_page_enabled` attribute of your app's build. The required parameters are app slug, build slug and artifact slug. You can fetch the build artifact slug if you first list all build artifacts of an app with the [GET /apps/](https://api-docs.bitrise.io/#/build-artifact/artifact-list) endpoint.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "artifact-params",
@@ -1114,6 +1198,8 @@ var Tags = []TagSpec{
 				Summary:      "Confirm a build certificate upload",
 				Description:  "This is the last step of uploading a build certificate to Bitrise. Confirm the build certificate upload and view the file on the Code Signing tab of a specific app. Read more in our [Confirming the iOS code signing file upload](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#confirming-the-ios-code-signing-file-upload) guide.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1139,6 +1225,8 @@ var Tags = []TagSpec{
 				Summary:      "Create a build certificate",
 				Description:  "Create a temporary pre-signed upload URL for the build certificate and upload the file to AWS with a simple `curl` request. To complete the uploading process and view your files on the Code Signing tab of your app, continue with the [POST /apps/{app-slug}/build-certificates/{build-certificate-slug}/uploaded](https://api-docs.bitrise.io/#/build-certificate/build-certificate-confirm) endpoint. Read more in our [Creating and uploading an iOS code signing file](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#creating--uploading-an-ios-code-signing-file) guide.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "build-certificate",
@@ -1164,6 +1252,8 @@ var Tags = []TagSpec{
 				Summary:      "Delete a build certificate",
 				Description:  "Delete an app's build certificate. You can fetch the build certificate slug for this endpoint if you first call the [GET /apps/{app-slug}/build-certificates](https://api-docs.bitrise.io/#/build-certificate/build-certificate-list) endpoint to list all available build certificates of an app. Read more in our [Deleting an iOS code signing file](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#deleting-an-ios-code-signing-file) guide.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1189,6 +1279,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a list of the build certificates",
 				Description:  "List all the build certificates that have been uploaded to a specific app. Read more in our [Listing the uploaded iOS code signing files of an app](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#listing-the-uploaded-ios-code-signing-files-of-an-app) guide.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"certificate_password", "is_expose", "is_protected", "processed", "slug", "upload_file_name", "upload_file_size"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1221,6 +1313,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a specific build certificate",
 				Description:  "Retrieve data of a specific build certificate. You can fetch the build certificate slug for this endpoint if you first call the [GET /apps/{app-slug}/build-certificates](https://api-docs.bitrise.io/#/build-certificate/build-certificate-list) endpoint to list all available build certificates of an app. Read more in our [Getting a specific iOS code signing file's data](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#getting-a-specific-ios-code-signing-files-data) guide.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"certificate_password", "download_url", "is_expose", "is_protected", "processed", "slug", "upload_file_name", "upload_file_size"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1246,6 +1340,8 @@ var Tags = []TagSpec{
 				Summary:      "Update a build certificate",
 				Description:  "Update an uploaded build certificate's attributes. You can fetch the build certificate slug for this endpoint if you first call the [GET /apps/{app-slug}/build-certificates](https://api-docs.bitrise.io/#/build-certificate/build-certificate-list) endpoint. Read more in our [Updating an uploaded iOS code signing file](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#confirming-the-ios-code-signing-file-upload) guide.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "build-certificate",
@@ -1283,6 +1379,8 @@ var Tags = []TagSpec{
 				Summary:      "List the open build requests for an app",
 				Description:  "List the existing open build requests of a specified Bitrise app",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"build_params", "created_at", "pull_request_url", "slug"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1301,6 +1399,8 @@ var Tags = []TagSpec{
 				Summary:      "Update a build request",
 				Description:  "Update a specific build request of a specific app",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "build-request",
@@ -1338,6 +1438,8 @@ var Tags = []TagSpec{
 				Summary:      "Abort a specific build",
 				Description:  "Abort a specific build. Set an abort reason with the `abort_reason` parameter. Use the `abort_with_success` parameter to abort a build but still count it as a successful one.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "build-abort-params",
@@ -1370,6 +1472,8 @@ var Tags = []TagSpec{
 				Summary:      "List 1000 archived builds of an app",
 				Description:  "List the first 1000 archived builds of a specified Bitrise app. Set parameters to filter builds:",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"abort_reason", "branch", "build_artifacts", "build_number", "commit_hash", "commit_message", "credit_cost", "finished_at", "machine_type_id", "original_build_params", "pipeline_workflow_id", "pull_request_id", "pull_request_target_branch", "pull_request_view_url", "slug", "stack_identifier", "started_on_worker_at", "status", "status_text", "tag", "triggered_by", "triggered_workflow"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1409,6 +1513,8 @@ var Tags = []TagSpec{
 				Summary:      "Get the bitrise.yml of a build",
 				Description:  "Get the bitrise.yml file of one of the builds of a given app. This will return the `bitrise.yml` configuration with which the build ran. You can compare it to [the current bitrise.yml configuration](https://api-docs.bitrise.io/#/application/app-config-datastore-show) of the app.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1434,6 +1540,8 @@ var Tags = []TagSpec{
 				Summary:      "List all builds of an app",
 				Description:  "List all the builds of a specified Bitrise app. Set parameters to filter builds: for example, you can search for builds run with a given workflow or all builds that were triggered by Pull Requests. It returns all the relevant data of the build.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"abort_reason", "branch", "build_number", "commit_hash", "commit_message", "commit_view_url", "credit_cost", "environment_prepare_finished_at", "finished_at", "is_on_hold", "is_processed", "is_status_sent", "log_format", "machine_type_id", "original_build_params", "pipeline_workflow_id", "pull_request_id", "pull_request_target_branch", "pull_request_view_url", "rebuildable", "slug", "stack_identifier", "started_on_worker_at", "status", "status_text", "tag", "triggered_at", "triggered_by", "triggered_workflow"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1543,6 +1651,8 @@ var Tags = []TagSpec{
 				Summary:      "List all builds",
 				Description:  "List all the Bitrise builds that can be accessed with the authenticated account. Filter builds based on their owner, using the owner slug, or the status of the build.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"abort_reason", "branch", "build_number", "commit_hash", "commit_message", "commit_view_url", "credit_cost", "environment_prepare_finished_at", "finished_at", "is_on_hold", "is_processed", "machine_type_id", "original_build_params", "pull_request_id", "pull_request_target_branch", "pull_request_view_url", "repository", "slug", "stack_identifier", "started_on_worker_at", "status", "status_text", "tag", "triggered_at", "triggered_by", "triggered_workflow"},
 				Params: []ParamSpec{
 					{
 						Name:        "is_on_hold",
@@ -1589,6 +1699,8 @@ var Tags = []TagSpec{
 				Summary:      "Get the build log of a build",
 				Description:  "Get the build log of a specified build of a Bitrise app. You can get the build slug either by calling the [/builds](https://api-docs.bitrise.io/#/builds/build-list) endpoint or by clicking on the build on bitrise.io and copying the slug from the URL. Preview of the log is returned in `log_chunks` field in JSON format. You can download the full raw log in txt by using the signed url returned in `expiring_raw_log_url`. Be aware that this url is expiring in 10 minutes!",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1614,6 +1726,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a build of a given app",
 				Description:  "Get the specified build of a given Bitrise app. You need to provide both an app slug and a build slug. You can get the build slug either by calling the [/builds](https://api-docs.bitrise.io/#/builds/build-list) endpoint or by clicking on the build on bitrise.io and copying the slug from the URL. The endpoint returns all the relevant data of the build.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"abort_reason", "branch", "build_number", "commit_hash", "commit_message", "commit_view_url", "credit_cost", "environment_prepare_finished_at", "finished_at", "is_on_hold", "is_processed", "is_status_sent", "log_format", "machine_type_id", "original_build_params", "pipeline_workflow_id", "pull_request_id", "pull_request_target_branch", "pull_request_view_url", "rebuildable", "slug", "stack_identifier", "started_on_worker_at", "status", "status_text", "tag", "triggered_at", "triggered_by", "triggered_workflow"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1639,6 +1753,8 @@ var Tags = []TagSpec{
 				Summary:      "Trigger a new build/pipeline",
 				Description:  "Trigger a new build/pipeline. Specify an app slug and at least one parameter out of three: a git tag or git commit hash, a branch, or a workflow/pipeline ID. You can also set specific parameters for Pull Request builds/pipelines and define additional environment variables for your build/pipeline. [Check out our detailed guide](https://devcenter.bitrise.io/api/build-trigger/).",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "build_params",
@@ -1664,6 +1780,8 @@ var Tags = []TagSpec{
 				Summary:      "List the workflows of an app",
 				Description:  "List the workflows that were triggered at any time for a given Bitrise app. Note that it might list workflows that are currently not defined in the app's `bitrise.yml` configuration - and conversely, workflows that were never triggered will not be listed even if they are defined in the `bitrise.yml` file.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"data"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1687,6 +1805,8 @@ var Tags = []TagSpec{
 				Summary:      "Find steps",
 				Description:  "Find steps for building workflows or step bundles in a Bitrise YML config file, based on name, description, tags or maintainers.Returns only the latest, non-deprecated versions.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"description", "id", "inputs", "is_deprecated", "is_latest", "latest_version_number", "maintainer", "outputs", "step_ref", "summary", "title", "version"},
 				Params: []ParamSpec{
 					{
 						Name:        "categories",
@@ -1719,6 +1839,8 @@ var Tags = []TagSpec{
 				Summary:      "List step inputs",
 				Description:  "List inputs of a step with their defaults, allowed values etc.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"default_value", "description", "is_required", "is_sensitive", "name", "summary", "title", "value_options"},
 				Params: []ParamSpec{
 					{
 						Name:        "step_ref",
@@ -1737,6 +1859,8 @@ var Tags = []TagSpec{
 				Summary:      "Validate a Bitrise YAML file",
 				Description:  "Validate a Bitrise YAML file",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "bitrise_yml",
@@ -1767,6 +1891,8 @@ var Tags = []TagSpec{
 				Summary:      "Confirm a generic project file upload",
 				Description:  "This is the last step of uploading a generic project file to Bitrise. Confirm the generic project file upload and view the file on the Code Signing tab of a specific app. Read more in our [Confirming the upload](https://devcenter.bitrise.io/api/managing-files-in-generic-file-storage/#confirming-the-file-upload) guide.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1792,6 +1918,8 @@ var Tags = []TagSpec{
 				Summary:      "Delete a generic project file",
 				Description:  "Delete an app's generic project file. You can fetch an app's generic project file slug if you first list all the uploaded files with the [GET /apps/{app-slug}/generic-project-files](https://api-docs.bitrise.io/#/generic-project-file/generic-project-file-list) endpoint. Read more in our [Deleting a file](https://devcenter.bitrise.io/api/managing-files-in-generic-file-storage/#deleting-a-file) guide.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1817,6 +1945,8 @@ var Tags = []TagSpec{
 				Summary:      "Create a generic project file",
 				Description:  "Create a temporary pre-signed upload URL (expires in 10 minutes) for the generic project file and upload it to AWS with a simple `curl` request. To complete the uploading process and view your files on the Code Signing tab of your app, continue with the [POST /apps/{app-slug}/generic-project-files/{generic-project-file-slug}/uploaded](https://api-docs.bitrise.io/#/generic-project-file/generic-project-file-confirm) endpoint. Read more in our [Creating and uploading files to Generic File Storage](https://devcenter.bitrise.io/api/managing-files-in-generic-file-storage/#creating-and-uploading-files-to-generic-file-storage) guide.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "generic-project-file",
@@ -1842,6 +1972,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a list of the generic project files",
 				Description:  "List all the generic project files that have been uploaded to a specific app. Read more in our [Listing the uploaded files of an app](https://devcenter.bitrise.io/api/managing-files-in-generic-file-storage/#listing-the-uploaded-files-of-an-app) guide.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"exposed_meta_datastore", "is_expose", "is_protected", "processed", "slug", "upload_file_name", "upload_file_size", "user_env_key"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1874,6 +2006,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a specific generic project file",
 				Description:  "Retrieve data of a specific generic project file to check its attributes and optionally modify them with the [PATCH /apps/](https://api-docs.bitrise.io/#/generic-project-file/generic-project-file-update) endpoint. Read more in our [Retrieving a specific file's data](https://devcenter.bitrise.io/api/managing-files-in-generic-file-storage/#retrieving-a-specific-files-data) guide.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"download_url", "exposed_meta_datastore", "is_expose", "is_protected", "processed", "slug", "upload_file_name", "upload_file_size", "user_env_key"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -1899,6 +2033,8 @@ var Tags = []TagSpec{
 				Summary:      "Update a generic project file",
 				Description:  "Update a generic project file's attributes. You can fetch an app's generic project file slug if you first list all the uploaded files with the [GET /apps/{app-slug}/generic-project-files](https://api-docs.bitrise.io/#/generic-project-file/generic-project-file-list) endpoint. Read more in our [Updating an uploaded file](https://devcenter.bitrise.io/api/managing-files-in-generic-file-storage/#updating-an-uploaded-file) guide.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "generic-project-file",
@@ -1936,6 +2072,8 @@ var Tags = []TagSpec{
 				Summary:      "Create Google Service Credential",
 				Description:  "Creates a new Google Service Credential with the given data.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "types",
@@ -1961,6 +2099,8 @@ var Tags = []TagSpec{
 				Summary:      "Delete Google Service Credential",
 				Description:  "Removes the Google Service Credential with the identifier.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "org-slug",
@@ -1979,6 +2119,8 @@ var Tags = []TagSpec{
 				Summary:      "List Google Service credentials for a specific organization",
 				Description:  "List Google Service credentials for a specific Bitrise Workspace",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"created_at", "is_enterprise_account", "issuer_id", "key_id", "name", "slug", "updated_at"},
 				Params: []ParamSpec{
 					{
 						Name:        "org-slug",
@@ -2002,6 +2144,8 @@ var Tags = []TagSpec{
 				Summary:      "Add a member to a group",
 				Description:  "Add a member to a group",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "member",
@@ -2032,6 +2176,8 @@ var Tags = []TagSpec{
 				Summary:      "Deletes a key-value cache item",
 				Description:  "Deletes a key-value cache item. Deleted cache items are no longer accessible and cannot be restored.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2057,6 +2203,8 @@ var Tags = []TagSpec{
 				Summary:      "Deletes all key-value cache items belonging to an app",
 				Description:  "Deletes all key-value cache items created by the builds of an app. Deleted cache items are no longer accessible and cannot be restored.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2075,6 +2223,8 @@ var Tags = []TagSpec{
 				Summary:      "Gets the download URL of a key-value cache item",
 				Description:  "Gets a download URL of a cache item.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"download_url"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2100,6 +2250,8 @@ var Tags = []TagSpec{
 				Summary:      "List the key-value cache items belonging to an app",
 				Description:  "List all the available cache items that the builds of the app created via the save-cache step.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"app_id", "archive_filename", "archive_size", "cache_key", "created_at", "expires_at", "id", "last_used_at", "storage_provider"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2137,6 +2289,8 @@ var Tags = []TagSpec{
 				Summary:      "Adds a group to the organization",
 				Description:  "Adds a group to the organization",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "member",
@@ -2162,6 +2316,8 @@ var Tags = []TagSpec{
 				Summary:      "List organizations groups",
 				Description:  "Lists the groups of an organization",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"name", "slug"},
 				Params: []ParamSpec{
 					{
 						Name:        "org-slug",
@@ -2180,6 +2336,8 @@ var Tags = []TagSpec{
 				Summary:      "Migrate machine types",
 				Description:  "Migrates all apps' machine types of an organization from one machine type to another",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "types",
@@ -2205,6 +2363,8 @@ var Tags = []TagSpec{
 				Summary:      "Adds a member to the organization",
 				Description:  "Adds a member to the organization",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "member",
@@ -2230,6 +2390,8 @@ var Tags = []TagSpec{
 				Summary:      "List the members of the organization",
 				Description:  "List the members of the organization",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"email", "slug", "username"},
 				Params: []ParamSpec{
 					{
 						Name:        "org-slug",
@@ -2248,6 +2410,8 @@ var Tags = []TagSpec{
 				Summary:      "List the organizations that the user is part of",
 				Description:  "List all Bitrise organizations that the user is part of",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"avatar_icon_url", "concurrency_count", "name", "owners", "slug"},
 				Params:       []ParamSpec{},
 			},
 			{
@@ -2258,6 +2422,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a specified organization.",
 				Description:  "Get a specified Bitrise organization that the user is part of.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"avatar_icon_url", "concurrency_count", "name", "owners", "slug"},
 				Params: []ParamSpec{
 					{
 						Name:        "org-slug",
@@ -2281,6 +2447,8 @@ var Tags = []TagSpec{
 				Summary:      "Create an outgoing webhook for an app",
 				Description:  "Create an outgoing webhook for a specified Bitrise app: this can be used to send build events to a specified URL with custom headers. Currently, only build events can trigger outgoing webhooks.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-webhook-create-params",
@@ -2306,6 +2474,8 @@ var Tags = []TagSpec{
 				Summary:      "Delete an outgoing webhook of an app",
 				Description:  "Delete an existing outgoing webhook for a specified Bitrise app.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2331,6 +2501,8 @@ var Tags = []TagSpec{
 				Summary:      "List the outgoing webhooks of an app",
 				Description:  "List all the outgoing webhooks registered for a specified Bitrise app. This returns all the relevant data of the webhook, including the slug of the webhook and its URL.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"created_at", "events", "headers", "registered_by_addon", "slug", "updated_at", "url"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2363,6 +2535,8 @@ var Tags = []TagSpec{
 				Summary:      "Update an outgoing webhook of an app",
 				Description:  "Update an existing outgoing webhook (URL, events, secrets and headers) for a specified Bitrise app. Even if you do not want to change one of the parameters, you still have to provide that parameter as well: simply use its existing value.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-webhook-update-params",
@@ -2400,6 +2574,8 @@ var Tags = []TagSpec{
 				Summary:      "Aborts a pipeline",
 				Description:  "Aborts a pipeline. You need to provide the app slug and the id of the pipeline. You can add an abort reason, choose to skip notifications and make the abort with success state.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "pipeline-abort-params",
@@ -2432,6 +2608,8 @@ var Tags = []TagSpec{
 				Summary:      "List all pipelines and standalone builds of an app",
 				Description:  "List all the pipelines and standalone builds of a specified Bitrise app. Set parameters to filter pipelines: for example, you can search for pipelines/standalone builds run with a given workflow name or all pipelines/standalone builds that were triggered by Pull Requests. It returns all the relevant data of the pipelines/standalone builds.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"artifacts", "branch", "build_number", "build_tool_invocations", "commit_hash", "commit_message", "credit_cost", "finished_at", "is_on_hold", "is_pipeline", "is_processed", "local_config", "pull_request_id", "pull_request_target_branch", "rebuildable", "slug", "started_at", "status", "tag", "trigger_params", "triggered_at", "triggered_by", "triggered_workflow"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2527,6 +2705,8 @@ var Tags = []TagSpec{
 				Summary:      "List all pipelines/standalone builds",
 				Description:  "List all the Bitrise pipelines/standalone builds that can be accessed with the authenticated account. Filter pipelines/standalone builds based on their owner, using the owner slug, or the status of the pipeline/standalone build.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"branch", "build_number", "commit_hash", "commit_message", "credit_cost", "finished_at", "is_on_hold", "is_pipeline", "is_processed", "pull_request_id", "pull_request_target_branch", "repository", "slug", "started_at", "status", "tag", "trigger_params", "triggered_at", "triggered_by", "triggered_workflow"},
 				Params: []ParamSpec{
 					{
 						Name:        "limit",
@@ -2566,6 +2746,8 @@ var Tags = []TagSpec{
 				Summary:      "Rebuilds a pipeline",
 				Description:  "Rebuilds a pipeline. You can rebuild the whole pipeline or only the unsuccessful and subsequent workflows by setting the partial flag to true.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "pipeline-rebuild-params",
@@ -2598,6 +2780,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a pipeline of a given app",
 				Description:  "Get the specified pipeline of a given Bitrise app. You need to provide both an app slug and a pipeline id. You can get the pipeline id either by calling the [/pipelines](https://api-docs.bitrise.io/#/pipelines/pipeline-list) endpoint or by clicking on the pipeline on bitrise.io and copying the id from the URL. The endpoint returns all the relevant data of the pipeline.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"abort_reason", "app", "attempts", "credit_cost", "current_attempt_id", "finished_at", "id", "name", "number_in_app_scope", "put_on_hold_at", "rebuildable", "stages", "started_at", "status", "trigger_params", "triggered_at", "triggered_by", "type", "workflows"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2628,6 +2812,8 @@ var Tags = []TagSpec{
 				Summary:      "Confirm a provisioning profile upload",
 				Description:  "This is the last step of the upload process. Confirm the provisioning profile upload and view the file on the Code Signing tab of a specific app. Read more in our [Confirming the iOS code signing file upload](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#confirming-the-ios-code-signing-file-upload) guide.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2653,6 +2839,8 @@ var Tags = []TagSpec{
 				Summary:      "Create a provisioning profile",
 				Description:  "Create a temporary pre-signed upload URL (expires in 10 minutes) for the provisioning profile and upload it to AWS with a simple `curl` request. To complete the upload process, continue with the [POST /apps/{app-slug}/provisioning-profiles/{provisioning-profile-slug}/uploaded](https://api-docs.bitrise.io/#/provisioning-profile/provisioning-profile-confirm) endpoint. Read more in our [Creating and uploading an iOS code signing file](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#creating--uploading-an-ios-code-signing-file) guide.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "provisioning-profile",
@@ -2678,6 +2866,8 @@ var Tags = []TagSpec{
 				Summary:      "Delete a provisioning profile",
 				Description:  "Delete an app's provisioning profile. You can fetch the provisioning profile's slug if you call the [GET /apps/{app-slug}/provisioning-profiles](https://api-docs.bitrise.io/#/provisioning-profile/provisioning-profile-list) endpoint. Read more in our [Deleting an iOS code signing file](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#deleting-an-ios-code-signing-file) guide.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2703,6 +2893,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a list of the provisioning profiles",
 				Description:  "List all the provisioning profiles that have been uploaded to a specific app. Read more in our [Listing the uploaded iOS code signing files of an app](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#listing-the-uploaded-ios-code-signing-files-of-an-app) guide.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"is_expose", "is_protected", "processed", "slug", "upload_file_name", "upload_file_size"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2735,6 +2927,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a specific provisioning profile",
 				Description:  "Retrieve data of a specific provisioning profile. You can fetch the provisioning profile's slug if you call the [GET /apps/{app-slug}/provisioning-profiles](https://api-docs.bitrise.io/#/provisioning-profile/provisioning-profile-list) endpoint. Read more in our [Getting a specific iOS code signing file's data](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#getting-a-specific-ios-code-signing-files-data) guide.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"download_url", "is_expose", "is_protected", "processed", "slug", "upload_file_name", "upload_file_size"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2760,6 +2954,8 @@ var Tags = []TagSpec{
 				Summary:      "Update a provisioning profile",
 				Description:  "Update an uploaded provisioning profile's attributes. You can fetch the provisioning profile's slug if you call the [GET /apps/{app-slug}/provisioning-profiles](https://api-docs.bitrise.io/#/provisioning-profile/provisioning-profile-list) endpoint. Read more in our [Updating an uploaded iOS code signing file](https://devcenter.bitrise.io/api/managing-ios-code-signing-files/#confirming-the-ios-code-signing-file-upload) guide.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "provisioning-profile",
@@ -2797,6 +2993,8 @@ var Tags = []TagSpec{
 				Summary:      "Create a new app secret",
 				Description:  "Create a new app secret",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "secret",
@@ -2822,6 +3020,8 @@ var Tags = []TagSpec{
 				Summary:      "Update an existing app secret",
 				Description:  "Update an existing app secret. If the secret is protected, only its value can be overridden.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "secret",
@@ -2854,6 +3054,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a single app secret by name",
 				Description:  "Get a single app secret by name, including the value if not protected",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"expand_in_step_inputs", "id", "is_exposed_for_pull_requests", "is_protected", "name", "scope", "value"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2879,6 +3081,8 @@ var Tags = []TagSpec{
 				Summary:      "Delete an application secret",
 				Description:  "Delete an application secret. Requires administrator level privileges to the app.",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2904,6 +3108,8 @@ var Tags = []TagSpec{
 				Summary:      "List the application secrets (with no values)",
 				Description:  "List the application secrets (with no values). Requires administrator level privileges to the app.",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"secrets"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -2922,6 +3128,8 @@ var Tags = []TagSpec{
 				Summary:      "Create a new organization secret",
 				Description:  "Create a new organization secret",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "secret",
@@ -2947,6 +3155,8 @@ var Tags = []TagSpec{
 				Summary:      "Delete a secret by name",
 				Description:  "Delete a secret by name",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "org-slug",
@@ -2972,6 +3182,8 @@ var Tags = []TagSpec{
 				Summary:      "Update an existing secret",
 				Description:  "Update an existing secret. If the secret is protected, only its value can be overridden.",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "secret",
@@ -3004,6 +3216,8 @@ var Tags = []TagSpec{
 				Summary:      "Get the secrets of an organization",
 				Description:  "Get the secrets of an organization",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"secrets"},
 				Params: []ParamSpec{
 					{
 						Name:        "org-slug",
@@ -3022,6 +3236,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a single secret by name",
 				Description:  "Get a single secret by name, including the value if not protected",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"expand_in_step_inputs", "id", "is_exposed_for_pull_requests", "is_protected", "name", "scope", "value"},
 				Params: []ParamSpec{
 					{
 						Name:        "org-slug",
@@ -3052,6 +3268,8 @@ var Tags = []TagSpec{
 				Summary:      "List the test devices for an app",
 				Description:  "List registered test devices of all members of a specified Bitrise app",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"device_id", "device_type", "owner"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -3075,6 +3293,8 @@ var Tags = []TagSpec{
 				Summary:      "Migrate machine types",
 				Description:  "Migrates all apps' machine types of a user from one machine type to another",
 				BodyRequired: true,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "types",
@@ -3100,6 +3320,8 @@ var Tags = []TagSpec{
 				Summary:      "Get your profile info",
 				Description:  "Shows the authenticated users profile info",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"avatar_url", "created_at", "data_id", "email", "has_used_organization_trial", "payment_processor", "slug", "unconfirmed_email", "username"},
 				Params:       []ParamSpec{},
 			},
 			{
@@ -3110,6 +3332,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a specific user",
 				Description:  "Show information about a specific user",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"avatar_url", "created_at", "data_id", "email", "has_used_organization_trial", "payment_processor", "slug", "unconfirmed_email", "username"},
 				Params: []ParamSpec{
 					{
 						Name:        "user-slug",
@@ -3133,6 +3357,8 @@ var Tags = []TagSpec{
 				Summary:      "List the webhook delivery items of an app",
 				Description:  "List all the delivery items of an outgoing webhook of a Bitrise application",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"created_at", "request_headers", "request_payload", "request_url", "response_body", "response_headers", "response_http_status", "response_seconds", "slug", "updated_at"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -3172,6 +3398,8 @@ var Tags = []TagSpec{
 				Summary:      "Re-deliver the webhook delivery items of an app",
 				Description:  "Re-deliver the delivery item of a specified webhook of a Bitrise application",
 				BodyRequired: false,
+				SupportsJSON: false,
+				JSONFields:   []string{},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",
@@ -3204,6 +3432,8 @@ var Tags = []TagSpec{
 				Summary:      "Get a specific delivery item of a webhook",
 				Description:  "Get the specified delivery item of an outgoing webhook of a Bitrise application",
 				BodyRequired: false,
+				SupportsJSON: true,
+				JSONFields:   []string{"created_at", "request_headers", "request_payload", "request_url", "response_body", "response_headers", "response_http_status", "response_seconds", "slug", "updated_at"},
 				Params: []ParamSpec{
 					{
 						Name:        "app-slug",

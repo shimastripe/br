@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/itchyny/gojq"
@@ -40,6 +41,8 @@ type RequestOptions struct {
 	RawFields      []string
 	TypedFields    []string
 	InputFile      string
+	JSONFields     []string
+	Template       string
 	Include        bool
 	Silent         bool
 	Verbose        bool
@@ -142,7 +145,7 @@ func (r *Runner) Execute(ctx context.Context, opts RequestOptions) error {
 		return nil
 	}
 
-	if opts.JQ != "" {
+	if opts.JQ != "" && opts.Template == "" && len(opts.JSONFields) == 0 {
 		if opts.Paginate && !opts.Slurp && len(pages) > 1 {
 			for _, page := range pages {
 				filtered, filterErr := applyJQ(opts.JQ, page)
@@ -158,6 +161,22 @@ func (r *Runner) Execute(ctx context.Context, opts RequestOptions) error {
 	result, err := combinePages(pages, opts.Slurp)
 	if err != nil {
 		return err
+	}
+
+	if len(opts.JSONFields) > 0 {
+		result, err = selectJSONFields(result, opts.JSONFields)
+		if err != nil {
+			return err
+		}
+	}
+
+	if strings.TrimSpace(opts.Template) != "" {
+		rendered, renderErr := applyTemplate(opts.Template, result)
+		if renderErr != nil {
+			return renderErr
+		}
+		writeBytes(r.Stdout, rendered)
+		return nil
 	}
 
 	if opts.JQ != "" {
@@ -545,6 +564,158 @@ func applyJQ(expr string, payload []byte) ([]byte, error) {
 		return []byte{}, nil
 	}
 	return append(bytes.Join(lines, []byte("\n")), '\n'), nil
+}
+
+func selectJSONFields(payload []byte, fields []string) ([]byte, error) {
+	selected := normalizeJSONFields(fields)
+	if len(selected) == 0 {
+		return nil, fmt.Errorf("--json requires at least one field")
+	}
+
+	var data any
+	if err := json.Unmarshal(payload, &data); err != nil {
+		return nil, fmt.Errorf("--json requires JSON response: %w", err)
+	}
+
+	filtered, err := filterJSONFields(data, selected)
+	if err != nil {
+		return nil, err
+	}
+
+	encoded, err := json.Marshal(filtered)
+	if err != nil {
+		return nil, fmt.Errorf("encode --json output: %w", err)
+	}
+	return encoded, nil
+}
+
+func normalizeJSONFields(fields []string) []string {
+	normalized := make([]string, 0, len(fields))
+	seen := map[string]struct{}{}
+	for _, entry := range fields {
+		for _, part := range strings.Split(entry, ",") {
+			field := strings.TrimSpace(part)
+			if field == "" {
+				continue
+			}
+			if _, ok := seen[field]; ok {
+				continue
+			}
+			seen[field] = struct{}{}
+			normalized = append(normalized, field)
+		}
+	}
+	return normalized
+}
+
+func filterJSONFields(data any, fields []string) (any, error) {
+	projected := projectJSONValue(data)
+
+	if rows, ok := asObjectRows(projected); ok {
+		filteredRows := make([]map[string]any, 0, len(rows))
+		for _, row := range rows {
+			filtered := make(map[string]any, len(fields))
+			for _, field := range fields {
+				filtered[field] = lookupField(row, field)
+			}
+			filteredRows = append(filteredRows, filtered)
+		}
+		return filteredRows, nil
+	}
+
+	object, ok := projected.(map[string]any)
+	if !ok {
+		return nil, fmt.Errorf("--json supports object responses and list responses")
+	}
+
+	filtered := make(map[string]any, len(fields))
+	for _, field := range fields {
+		filtered[field] = lookupField(object, field)
+	}
+	return filtered, nil
+}
+
+func lookupField(object map[string]any, path string) any {
+	current := any(object)
+	for _, part := range strings.Split(path, ".") {
+		segment := strings.TrimSpace(part)
+		if segment == "" {
+			return nil
+		}
+		typed, ok := current.(map[string]any)
+		if !ok {
+			return nil
+		}
+		next, ok := typed[segment]
+		if !ok {
+			return nil
+		}
+		current = next
+	}
+	return current
+}
+
+func applyTemplate(tmpl string, payload []byte) ([]byte, error) {
+	var data any
+	if err := json.Unmarshal(payload, &data); err != nil {
+		return nil, fmt.Errorf("--template requires JSON response: %w", err)
+	}
+
+	compiled, err := template.New("output").Funcs(template.FuncMap{
+		"json": func(v any) (string, error) {
+			encoded, encodeErr := json.Marshal(v)
+			if encodeErr != nil {
+				return "", encodeErr
+			}
+			return string(encoded), nil
+		},
+	}).Parse(tmpl)
+	if err != nil {
+		return nil, fmt.Errorf("parse --template value: %w", err)
+	}
+
+	var out bytes.Buffer
+	if err := compiled.Execute(&out, data); err != nil {
+		return nil, fmt.Errorf("execute --template value: %w", err)
+	}
+	return out.Bytes(), nil
+}
+
+func projectJSONValue(data any) any {
+	object, ok := data.(map[string]any)
+	if !ok {
+		return data
+	}
+
+	raw, ok := object["data"]
+	if !ok {
+		return data
+	}
+
+	switch typed := raw.(type) {
+	case map[string]any:
+		return typed
+	case []any:
+		return typed
+	default:
+		return data
+	}
+}
+
+func asObjectRows(data any) ([]map[string]any, bool) {
+	typed, ok := data.([]any)
+	if !ok {
+		return nil, false
+	}
+	rows := make([]map[string]any, 0, len(typed))
+	for _, item := range typed {
+		object, ok := item.(map[string]any)
+		if !ok {
+			return nil, false
+		}
+		rows = append(rows, object)
+	}
+	return rows, true
 }
 
 func printRequest(w io.Writer, req *http.Request, body []byte) {

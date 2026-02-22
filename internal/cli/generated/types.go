@@ -16,6 +16,8 @@ type OperationSpec struct {
 	Summary      string
 	Description  string
 	BodyRequired bool
+	SupportsJSON bool
+	JSONFields   []string
 	Params       []ParamSpec
 }
 
