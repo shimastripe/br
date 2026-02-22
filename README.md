@@ -21,6 +21,46 @@ mise use github:shimastripe/br@latest
 
 Prebuilt binaries are available in the GitHub [Release Notes](https://github.com/shimastripe/br/releases).
 
+## Shell Completion
+
+Generate shell completion scripts with `br completion <shell>`.
+
+### bash
+
+```bash
+echo 'eval "$(br completion bash)"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### zsh
+
+```bash
+mkdir -p ~/.zsh/completions
+br completion zsh > ~/.zsh/completions/_br
+echo 'fpath=(~/.zsh/completions $fpath)' >> ~/.zshrc
+echo 'autoload -U compinit && compinit -i' >> ~/.zshrc
+source ~/.zshrc
+```
+
+If you use Homebrew on Apple Silicon, you can also install directly to:
+
+```bash
+br completion zsh > /opt/homebrew/share/zsh/site-functions/_br
+```
+
+### fish
+
+```bash
+mkdir -p ~/.config/fish/completions
+br completion fish > ~/.config/fish/completions/br.fish
+```
+
+### powershell
+
+```powershell
+br completion powershell | Out-String | Invoke-Expression
+```
+
 ## Main Commands
 
 ```bash
