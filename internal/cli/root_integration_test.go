@@ -164,12 +164,11 @@ func TestGeneratedCommandAddonsList(t *testing.T) {
 	if gotAuth != token {
 		t.Fatalf("Authorization header = %q; want %q", gotAuth, token)
 	}
-	var decoded map[string]any
-	if err := json.Unmarshal([]byte(stdout), &decoded); err != nil {
-		t.Fatalf("decode stdout as JSON: %v (stdout=%q)", err, stdout)
+	if !strings.Contains(stdout, "ID") || !strings.Contains(stdout, "SLUG") {
+		t.Fatalf("expected table headers in stdout: %q", stdout)
 	}
-	if _, ok := decoded["data"]; !ok {
-		t.Fatalf("expected data field in response: %#v", decoded)
+	if !strings.Contains(stdout, "addon-id") || !strings.Contains(stdout, "addon-slug") {
+		t.Fatalf("expected table values in stdout: %q", stdout)
 	}
 }
 
@@ -187,9 +186,9 @@ func TestGeneratedCommandAddonsListJSONFields(t *testing.T) {
 		t.Fatalf("save token: %v", err)
 	}
 
-	stdout, _, err := executeCLI(t, store, server.Client(), "", "addons", "list", "--hostname", server.URL, "--json", "id,title")
+	stdout, _, err := executeCLI(t, store, server.Client(), "", "addons", "list", "--hostname", server.URL, "--format", "json", "--fields", "id,title")
 	if err != nil {
-		t.Fatalf("addons list --json failed: %v", err)
+		t.Fatalf("addons list --fields failed: %v", err)
 	}
 
 	var rows []map[string]any
@@ -232,7 +231,9 @@ func TestGeneratedCommandAddonsListTemplate(t *testing.T) {
 		"list",
 		"--hostname",
 		server.URL,
-		"--json",
+		"--format",
+		"json",
+		"--fields",
 		"id,title",
 		"--template",
 		templateArg,
@@ -245,21 +246,44 @@ func TestGeneratedCommandAddonsListTemplate(t *testing.T) {
 	}
 }
 
-func TestGeneratedCommandAddonsListHelpIncludesJSONFields(t *testing.T) {
+func TestGeneratedCommandAddonsListFormatJSON(t *testing.T) {
+	const token = "addons-json-format-token"
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = io.WriteString(w, `{"data":[{"id":"addon-id","title":"addon-title"}]}`)
+	}))
+	defer server.Close()
+
+	store := newTestStore(t)
+	if err := store.SaveToken(server.URL, token, true); err != nil {
+		t.Fatalf("save token: %v", err)
+	}
+
+	stdout, _, err := executeCLI(t, store, server.Client(), "", "addons", "list", "--hostname", server.URL, "--format", "json")
+	if err != nil {
+		t.Fatalf("addons list --format json failed: %v", err)
+	}
+	if !strings.Contains(stdout, "\"data\"") {
+		t.Fatalf("expected raw json output, got: %q", stdout)
+	}
+}
+
+func TestGeneratedCommandAddonsListHelpIncludesAvailableFields(t *testing.T) {
 	store := newTestStore(t)
 	stdout, _, err := executeCLI(t, store, nil, "", "addons", "list", "--help")
 	if err != nil {
 		t.Fatalf("addons list --help failed: %v", err)
 	}
-	if !strings.Contains(stdout, "JSON FIELDS") {
-		t.Fatalf("help should include JSON FIELDS, got: %q", stdout)
+	if !strings.Contains(stdout, "AVAILABLE FIELDS") {
+		t.Fatalf("help should include AVAILABLE FIELDS, got: %q", stdout)
 	}
 	if !strings.Contains(stdout, "id") {
 		t.Fatalf("help should include schema fields, got: %q", stdout)
 	}
 }
 
-func TestGeneratedCommandAddonsListRejectsUnknownJSONField(t *testing.T) {
+func TestGeneratedCommandAddonsListRejectsUnknownField(t *testing.T) {
 	const token = "addons-json-invalid-token"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -273,22 +297,46 @@ func TestGeneratedCommandAddonsListRejectsUnknownJSONField(t *testing.T) {
 		t.Fatalf("save token: %v", err)
 	}
 
-	_, _, err := executeCLI(t, store, server.Client(), "", "addons", "list", "--hostname", server.URL, "--json", "id,unknown")
+	_, _, err := executeCLI(t, store, server.Client(), "", "addons", "list", "--hostname", server.URL, "--fields", "id,unknown")
 	if err == nil {
-		t.Fatal("expected error for unknown --json field")
+		t.Fatal("expected error for unknown --fields value")
 	}
-	if !strings.Contains(err.Error(), "unsupported --json field(s)") {
+	if !strings.Contains(err.Error(), "unsupported --fields value(s)") {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
 
-func TestGeneratedCommandPostDoesNotHaveJSONFlag(t *testing.T) {
+func TestGeneratedCommandAddonsListTemplateRejectsTableFormat(t *testing.T) {
 	store := newTestStore(t)
-	_, _, err := executeCLI(t, store, nil, "", "builds", "trigger", "--json", "slug")
+	_, _, err := executeCLI(
+		t,
+		store,
+		nil,
+		"",
+		"addons",
+		"list",
+		"--fields",
+		"id",
+		"--template",
+		"{{.id}}",
+		"--format",
+		"table",
+	)
+	if err == nil {
+		t.Fatal("expected error for --template with --format table")
+	}
+	if !strings.Contains(err.Error(), "--template cannot be used with --format table") {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestGeneratedCommandPostDoesNotHaveFieldsFlag(t *testing.T) {
+	store := newTestStore(t)
+	_, _, err := executeCLI(t, store, nil, "", "builds", "trigger", "--fields", "slug")
 	if err == nil {
 		t.Fatal("expected unknown flag error")
 	}
-	if !strings.Contains(err.Error(), "unknown flag: --json") {
+	if !strings.Contains(err.Error(), "unknown flag: --fields") {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }

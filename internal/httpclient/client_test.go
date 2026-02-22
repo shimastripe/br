@@ -149,3 +149,51 @@ func TestApplyTemplate(t *testing.T) {
 		t.Fatalf("unexpected rendered template: %q", string(rendered))
 	}
 }
+
+func TestRenderTableFromDataList(t *testing.T) {
+	payload := []byte(`{"data":[{"id":"1","title":"one","status":"ok"}]}`)
+
+	table, err := renderTable(payload, nil)
+	if err != nil {
+		t.Fatalf("render table: %v", err)
+	}
+
+	output := string(table)
+	if !strings.Contains(output, "ID") || !strings.Contains(output, "TITLE") {
+		t.Fatalf("unexpected table headers: %q", output)
+	}
+	if !strings.Contains(output, "1") || !strings.Contains(output, "one") {
+		t.Fatalf("unexpected table values: %q", output)
+	}
+}
+
+func TestRenderTableFromDataObject(t *testing.T) {
+	payload := []byte(`{"data":{"id":"1","title":"one","status":"ok"}}`)
+
+	table, err := renderTable(payload, nil)
+	if err != nil {
+		t.Fatalf("render table: %v", err)
+	}
+
+	output := string(table)
+	if !strings.Contains(output, "ID") || !strings.Contains(output, "1") {
+		t.Fatalf("unexpected object table output: %q", output)
+	}
+}
+
+func TestRenderTableWithSelectedFields(t *testing.T) {
+	payload := []byte(`{"data":[{"id":"1","title":"one","status":"ok"}]}`)
+
+	table, err := renderTable(payload, []string{"title", "id"})
+	if err != nil {
+		t.Fatalf("render table with selected fields: %v", err)
+	}
+
+	output := string(table)
+	if !strings.Contains(output, "TITLE") || !strings.Contains(output, "ID") {
+		t.Fatalf("unexpected selected headers: %q", output)
+	}
+	if strings.Contains(output, "STATUS") {
+		t.Fatalf("status should not be displayed when selected fields are set: %q", output)
+	}
+}

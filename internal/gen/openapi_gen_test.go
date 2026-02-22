@@ -51,10 +51,10 @@ func TestBuildOperationsFromSpec(t *testing.T) {
 			t.Fatalf("deprecated operation %q should not be generated", op.OperationID)
 		}
 		if op.Method == "GET" && !op.SupportsJSON {
-			t.Fatalf("GET operation %q should support --json", op.OperationID)
+			t.Fatalf("GET operation %q should support --fields", op.OperationID)
 		}
 		if op.Method != "GET" && op.SupportsJSON {
-			t.Fatalf("non-GET operation %q should not support --json", op.OperationID)
+			t.Fatalf("non-GET operation %q should not support --fields", op.OperationID)
 		}
 		if seenByTag[op.Tag] == nil {
 			seenByTag[op.Tag] = map[string]bool{}

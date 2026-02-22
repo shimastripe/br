@@ -39,8 +39,9 @@ func newOperationCommand(runner *httpclient.Runner, op OperationSpec) *cobra.Com
 	var rawFields []string
 	var typedFields []string
 	var inputFile string
-	var jsonFields string
+	var selectedFieldsRaw string
 	var outputTemplate string
+	var outputFormat string
 	var include bool
 	var silent bool
 	var verbose bool
@@ -100,15 +101,25 @@ func newOperationCommand(runner *httpclient.Runner, op OperationSpec) *cobra.Com
 				return fmt.Errorf("--slurp requires --paginate")
 			}
 
-			selectedFields, err := parseJSONFieldsFlag(jsonFields)
+			selectedFields, err := parseFieldsFlag(selectedFieldsRaw)
 			if err != nil {
 				return err
 			}
-			if err := validateJSONFields(selectedFields, op.JSONFields); err != nil {
+			if err := validateFields(selectedFields, op.JSONFields); err != nil {
+				return err
+			}
+			format, err := normalizeOutputFormat(outputFormat)
+			if err != nil {
 				return err
 			}
 			if strings.TrimSpace(outputTemplate) != "" && len(selectedFields) == 0 {
-				return fmt.Errorf("--template requires --json")
+				return fmt.Errorf("--template requires --fields")
+			}
+			if strings.TrimSpace(outputTemplate) != "" && format != "json" {
+				return fmt.Errorf("--template cannot be used with --format %s", format)
+			}
+			if strings.TrimSpace(jq) != "" && format != "json" {
+				return fmt.Errorf("--jq cannot be used with --format %s", format)
 			}
 
 			return runner.Execute(cmd.Context(), httpclient.RequestOptions{
@@ -122,6 +133,7 @@ func newOperationCommand(runner *httpclient.Runner, op OperationSpec) *cobra.Com
 				InputFile:      inputFile,
 				JSONFields:     selectedFields,
 				Template:       outputTemplate,
+				OutputFormat:   format,
 				Include:        include,
 				Silent:         silent,
 				Verbose:        verbose,
@@ -156,8 +168,9 @@ func newOperationCommand(runner *httpclient.Runner, op OperationSpec) *cobra.Com
 	command.Flags().StringArrayVarP(&typedFields, "field", "F", nil, "Add a typed parameter in key=value format (use @<path> or @-)")
 	command.Flags().StringVar(&inputFile, "input", "", "The file to use as body for the request (use - for stdin)")
 	if op.SupportsJSON {
-		command.Flags().StringVar(&jsonFields, "json", "", "Output JSON with the specified fields (comma-separated)")
+		command.Flags().StringVar(&selectedFieldsRaw, "fields", "", "Select response fields (comma-separated)")
 		command.Flags().StringVarP(&outputTemplate, "template", "t", "", "Format JSON output using a Go template")
+		command.Flags().StringVar(&outputFormat, "format", "table", "Output format: {table|json}")
 	}
 	command.Flags().BoolVarP(&include, "include", "i", false, "Include HTTP response status line and headers in output")
 	command.Flags().BoolVar(&silent, "silent", false, "Do not print the response body")
@@ -188,16 +201,16 @@ func buildOperationLong(op OperationSpec) string {
 
 	if op.SupportsJSON {
 		if len(op.JSONFields) > 0 {
-			parts = append(parts, "JSON FIELDS\n  "+strings.Join(op.JSONFields, ", "))
+			parts = append(parts, "AVAILABLE FIELDS\n  "+strings.Join(op.JSONFields, ", "))
 		} else {
-			parts = append(parts, "JSON FIELDS\n  (schema-defined fields are unavailable for this endpoint)")
+			parts = append(parts, "AVAILABLE FIELDS\n  (schema-defined fields are unavailable for this endpoint)")
 		}
 	}
 
 	return strings.TrimSpace(strings.Join(parts, "\n\n"))
 }
 
-func parseJSONFieldsFlag(raw string) ([]string, error) {
+func parseFieldsFlag(raw string) ([]string, error) {
 	if strings.TrimSpace(raw) == "" {
 		return nil, nil
 	}
@@ -218,12 +231,12 @@ func parseJSONFieldsFlag(raw string) ([]string, error) {
 	}
 
 	if len(fields) == 0 {
-		return nil, fmt.Errorf("invalid --json value: expected comma-separated field names")
+		return nil, fmt.Errorf("invalid --fields value: expected comma-separated field names")
 	}
 	return fields, nil
 }
 
-func validateJSONFields(selected []string, allowed []string) error {
+func validateFields(selected []string, allowed []string) error {
 	if len(selected) == 0 || len(allowed) == 0 {
 		return nil
 	}
@@ -244,8 +257,22 @@ func validateJSONFields(selected []string, allowed []string) error {
 	}
 
 	return fmt.Errorf(
-		"unsupported --json field(s): %s (available: %s)",
+		"unsupported --fields value(s): %s (available: %s)",
 		strings.Join(invalid, ", "),
 		strings.Join(allowed, ", "),
 	)
+}
+
+func normalizeOutputFormat(raw string) (string, error) {
+	normalized := strings.ToLower(strings.TrimSpace(raw))
+	if normalized == "" {
+		return "json", nil
+	}
+
+	switch normalized {
+	case "json", "table":
+		return normalized, nil
+	default:
+		return "", fmt.Errorf("invalid --format value %q: expected json or table", raw)
+	}
 }

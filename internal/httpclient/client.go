@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"text/tabwriter"
 	"text/template"
 	"time"
 
@@ -43,6 +44,7 @@ type RequestOptions struct {
 	InputFile      string
 	JSONFields     []string
 	Template       string
+	OutputFormat   string
 	Include        bool
 	Silent         bool
 	Verbose        bool
@@ -185,6 +187,15 @@ func (r *Runner) Execute(ctx context.Context, opts RequestOptions) error {
 			return filterErr
 		}
 		writeBytes(r.Stdout, filtered)
+		return nil
+	}
+
+	if strings.EqualFold(strings.TrimSpace(opts.OutputFormat), "table") {
+		table, tableErr := renderTable(result, opts.JSONFields)
+		if tableErr != nil {
+			return tableErr
+		}
+		writeBytes(r.Stdout, table)
 		return nil
 	}
 
@@ -569,12 +580,12 @@ func applyJQ(expr string, payload []byte) ([]byte, error) {
 func selectJSONFields(payload []byte, fields []string) ([]byte, error) {
 	selected := normalizeJSONFields(fields)
 	if len(selected) == 0 {
-		return nil, fmt.Errorf("--json requires at least one field")
+		return nil, fmt.Errorf("--fields requires at least one field")
 	}
 
 	var data any
 	if err := json.Unmarshal(payload, &data); err != nil {
-		return nil, fmt.Errorf("--json requires JSON response: %w", err)
+		return nil, fmt.Errorf("--fields requires JSON response: %w", err)
 	}
 
 	filtered, err := filterJSONFields(data, selected)
@@ -584,7 +595,7 @@ func selectJSONFields(payload []byte, fields []string) ([]byte, error) {
 
 	encoded, err := json.Marshal(filtered)
 	if err != nil {
-		return nil, fmt.Errorf("encode --json output: %w", err)
+		return nil, fmt.Errorf("encode --fields output: %w", err)
 	}
 	return encoded, nil
 }
@@ -625,7 +636,7 @@ func filterJSONFields(data any, fields []string) (any, error) {
 
 	object, ok := projected.(map[string]any)
 	if !ok {
-		return nil, fmt.Errorf("--json supports object responses and list responses")
+		return nil, fmt.Errorf("--fields supports object responses and list responses")
 	}
 
 	filtered := make(map[string]any, len(fields))
@@ -716,6 +727,169 @@ func asObjectRows(data any) ([]map[string]any, bool) {
 		rows = append(rows, object)
 	}
 	return rows, true
+}
+
+func asObjectRow(data any) (map[string]any, bool) {
+	object, ok := data.(map[string]any)
+	if !ok {
+		return nil, false
+	}
+	return object, true
+}
+
+func renderTable(payload []byte, selectedFields []string) ([]byte, error) {
+	var data any
+	if err := json.Unmarshal(payload, &data); err != nil {
+		return nil, fmt.Errorf("--format table requires JSON response: %w", err)
+	}
+
+	projected := projectJSONValue(data)
+	rows := make([]map[string]any, 0)
+	if listRows, ok := asObjectRows(projected); ok {
+		rows = append(rows, listRows...)
+	} else if row, ok := asObjectRow(projected); ok {
+		rows = append(rows, row)
+	} else {
+		return nil, fmt.Errorf("--format table supports object responses and list responses")
+	}
+
+	if len(rows) == 0 {
+		return []byte{}, nil
+	}
+
+	columns := selectTableColumns(rows, selectedFields)
+	if len(columns) == 0 {
+		return nil, fmt.Errorf("--format table: no displayable columns found")
+	}
+
+	var out bytes.Buffer
+	writer := tabwriter.NewWriter(&out, 0, 0, 2, ' ', 0)
+
+	headers := make([]string, 0, len(columns))
+	for _, column := range columns {
+		header := strings.ToUpper(strings.ReplaceAll(column, "_", " "))
+		header = strings.ReplaceAll(header, ".", " ")
+		headers = append(headers, header)
+	}
+	_, _ = fmt.Fprintln(writer, strings.Join(headers, "\t"))
+
+	for _, row := range rows {
+		values := make([]string, 0, len(columns))
+		for _, column := range columns {
+			values = append(values, formatTableValue(lookupField(row, column)))
+		}
+		_, _ = fmt.Fprintln(writer, strings.Join(values, "\t"))
+	}
+
+	if err := writer.Flush(); err != nil {
+		return nil, fmt.Errorf("render table output: %w", err)
+	}
+
+	return out.Bytes(), nil
+}
+
+func selectTableColumns(rows []map[string]any, selectedFields []string) []string {
+	selected := normalizeJSONFields(selectedFields)
+	if len(selected) > 0 {
+		return selected
+	}
+
+	counts := map[string]int{}
+	for _, row := range rows {
+		for key := range row {
+			counts[key]++
+		}
+	}
+	if len(counts) == 0 {
+		return nil
+	}
+
+	preferred := []string{
+		"id",
+		"slug",
+		"title",
+		"name",
+		"status",
+		"state",
+		"branch",
+		"triggered_workflow",
+		"created_at",
+		"updated_at",
+		"finished_at",
+	}
+
+	columns := make([]string, 0, 5)
+	for _, key := range preferred {
+		if counts[key] == 0 {
+			continue
+		}
+		columns = append(columns, key)
+		if len(columns) == 5 {
+			return columns
+		}
+	}
+
+	type countedField struct {
+		Name  string
+		Count int
+	}
+	rest := make([]countedField, 0, len(counts))
+	for key, count := range counts {
+		if containsField(columns, key) {
+			continue
+		}
+		rest = append(rest, countedField{Name: key, Count: count})
+	}
+	sort.Slice(rest, func(i, j int) bool {
+		if rest[i].Count == rest[j].Count {
+			return rest[i].Name < rest[j].Name
+		}
+		return rest[i].Count > rest[j].Count
+	})
+
+	for _, field := range rest {
+		columns = append(columns, field.Name)
+		if len(columns) == 5 {
+			break
+		}
+	}
+	return columns
+}
+
+func containsField(fields []string, expected string) bool {
+	for _, field := range fields {
+		if field == expected {
+			return true
+		}
+	}
+	return false
+}
+
+func formatTableValue(value any) string {
+	switch typed := value.(type) {
+	case nil:
+		return ""
+	case string:
+		return typed
+	case bool:
+		if typed {
+			return "true"
+		}
+		return "false"
+	case float64:
+		if typed == float64(int64(typed)) {
+			return strconv.FormatInt(int64(typed), 10)
+		}
+		return strconv.FormatFloat(typed, 'f', -1, 64)
+	case []any, map[string]any:
+		encoded, err := json.Marshal(typed)
+		if err != nil {
+			return fmt.Sprintf("%v", typed)
+		}
+		return string(encoded)
+	default:
+		return fmt.Sprintf("%v", typed)
+	}
 }
 
 func printRequest(w io.Writer, req *http.Request, body []byte) {

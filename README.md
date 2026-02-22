@@ -76,14 +76,20 @@ br api /apps/{app-slug}/builds --paginate --slurp
 br addons list
 br builds trigger --app-slug <app-slug> -f branch=main
 
-# select only specific fields as JSON
-br addons list --json id,title
+# GET commands default to table output
+br addons list
 
-# show available --json fields in help
+# switch back to raw JSON output
+br addons list --format json
+
+# select only specific fields in JSON output
+br addons list --format json --fields id,title
+
+# show available fields in help
 br addons list --help
 
 # format selected JSON using a Go template
-br addons list --json id,title --template '{{range .}}{{.id}} {{.title}}{{"\n"}}{{end}}'
+br addons list --format json --fields id,title --template '{{range .}}{{.id}} {{.title}}{{"\n"}}{{end}}'
 ```
 
 ## Credential Storage
