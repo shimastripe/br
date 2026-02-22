@@ -5,6 +5,10 @@ on:
     types:
       - published
 
+concurrency:
+  group: release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
