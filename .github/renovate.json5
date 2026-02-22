@@ -1,0 +1,50 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+
+  extends: [
+    "config:recommended",
+    ":semanticCommits",
+    ":timezone(Asia/Tokyo)",
+    ":label(dependencies)",
+  ],
+
+  enabledManagers: [
+    "gomod",
+    "github-actions",
+  ],
+
+  rangeStrategy: "replace",
+  dependencyDashboard: true,
+  rebaseWhen: "behind-base-branch",
+
+  packageRules: [
+    {
+      matchManagers: ["gomod", "github-actions"],
+      matchUpdateTypes: ["minor", "patch", "pin", "digest"],
+      automerge: true,
+      automergeType: "pr",
+    },
+    {
+      matchManagers: ["gomod"],
+      postUpdateOptions: ["gomodTidy"],
+    },
+    {
+      matchManagers: ["github-actions"],
+      pinDigests: true,
+      groupName: "github actions",
+      commitMessageTopic: "github actions",
+    },
+    {
+      matchManagers: ["gomod"],
+      matchDepTypes: ["direct"],
+      groupName: "go direct dependencies",
+      commitMessageTopic: "go dependencies",
+    },
+    {
+      matchManagers: ["gomod"],
+      matchDepTypes: ["indirect"],
+      groupName: "go indirect dependencies",
+      commitMessageTopic: "go indirect dependencies",
+    },
+  ],
+}

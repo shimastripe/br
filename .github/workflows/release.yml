@@ -1,0 +1,86 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run tests
+        run: make test
+
+      - name: Build release assets
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          VERSION="${TAG#v}"
+          DIST_DIR="dist"
+          BUILD_DIR="${DIST_DIR}/build"
+
+          rm -rf "${DIST_DIR}"
+          mkdir -p "${DIST_DIR}" "${BUILD_DIR}"
+
+          targets=(
+            "linux amd64"
+            "linux arm64"
+            "darwin amd64"
+            "darwin arm64"
+            "windows amd64"
+          )
+
+          for target in "${targets[@]}"; do
+            read -r GOOS GOARCH <<< "${target}"
+
+            BIN_NAME="br"
+            if [ "${GOOS}" = "windows" ]; then
+              BIN_NAME="br.exe"
+            fi
+
+            BUILD_OUT="${BUILD_DIR}/${BIN_NAME}-${GOOS}-${GOARCH}"
+            GOOS="${GOOS}" GOARCH="${GOARCH}" CGO_ENABLED=0 \
+              go build -trimpath -ldflags="-s -w" -o "${BUILD_OUT}" ./cmd/br
+
+            ASSET_BASENAME="br_${VERSION}_${GOOS}_${GOARCH}"
+            PACKAGE_DIR="${DIST_DIR}/${ASSET_BASENAME}"
+            mkdir -p "${PACKAGE_DIR}"
+            cp "${BUILD_OUT}" "${PACKAGE_DIR}/${BIN_NAME}"
+
+            if [ "${GOOS}" = "windows" ]; then
+              (cd "${PACKAGE_DIR}" && zip -q "../${ASSET_BASENAME}.zip" "${BIN_NAME}")
+            else
+              tar -C "${PACKAGE_DIR}" -czf "${DIST_DIR}/${ASSET_BASENAME}.tar.gz" "${BIN_NAME}"
+            fi
+
+            rm -rf "${PACKAGE_DIR}"
+          done
+
+          rm -rf "${BUILD_DIR}"
+          (cd "${DIST_DIR}" && sha256sum br_* > checksums.txt)
+          ls -lh "${DIST_DIR}"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/checksums.txt
+          fail_on_unmatched_files: true
