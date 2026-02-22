@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bitrise GH-like CLI (Go)"
+  short_description: "Build a gh-style Bitrise CLI in Go"
+  default_prompt: "Use $bitrise-ghlike-cli-go to implement or evolve a Go Bitrise CLI with auth, generic API mode, and OpenAPI-generated commands."
