@@ -21,6 +21,13 @@
   - `<tag>-`
   - `<singular(tag)>-`
 - Keep `operationId` as command alias to avoid discoverability loss.
+- For generated GET operations:
+  - default output format is `table`
+  - supported formats are `--format {table|json}`
+  - field projection uses `--fields`
+  - help includes `AVAILABLE FIELDS`
+  - `--template` requires `--fields` and `--format json`
+  - `--jq` cannot be used with `--format table`
 
 ## Auth Rules
 
@@ -58,6 +65,7 @@
 - `make check-generated` has zero diff after regeneration.
 - `make test` passes.
 - `go build` succeeds and help output includes `auth`, `api`, and generated tag groups.
+- Generated GET help output includes `AVAILABLE FIELDS`, `--fields`, and `--format`.
 
 ## High-value Integration Tests
 

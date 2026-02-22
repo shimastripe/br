@@ -26,6 +26,13 @@ Use this skill to keep the CLI architecture consistent while adding or modifying
   - Validate token with `GET /v0.1/me` before saving.
 - Keep generated commands excluding endpoints where Swagger has `deprecated: true`.
 - Keep operation alias as `operationId` on generated subcommands.
+- Keep generated GET command output behavior:
+  - default output format is `table` (`--format table`)
+  - raw JSON output is available via `--format json`
+  - field projection uses `--fields a,b,c` (not `--json`)
+  - `--template` requires `--fields` and `--format json`
+  - `--jq` cannot be combined with `--format table`
+  - help for generated GET commands should include an `AVAILABLE FIELDS` section
 - Keep `api` flag semantics aligned with gh-like behavior:
   - `-f/--raw-field` and `-F/--field` auto-switch method to `POST` unless method explicitly set.
   - With `--input`, treat fields as query params and use input as body.
@@ -61,6 +68,7 @@ make test
 GOCACHE=/tmp/go-build GOMODCACHE=/tmp/gomodcache go build -o bin/br ./cmd/br
 ./bin/br --help
 ./bin/br auth login --help
+./bin/br addons list --help
 ```
 
 ## Debugging Checklist
