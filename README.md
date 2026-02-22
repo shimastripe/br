@@ -9,6 +9,18 @@ A gh-like CLI for Bitrise written in Go.
 - Token login via `br auth login --with-token` (supports argument and stdin)
 - Built-in command and option help via `help` / `--help`
 
+## Installation
+
+### Mise (Recommended)
+
+```bash
+mise use github:shimastripe/br@latest
+```
+
+### Binary
+
+Prebuilt binaries are available in the GitHub [Release Notes](https://github.com/shimastripe/br/releases).
+
 ## Main Commands
 
 ```bash
