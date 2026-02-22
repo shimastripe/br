@@ -1,9 +1,9 @@
 name: release
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types:
+      - published
 
 permissions:
   contents: write
@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Setup Go
         uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
@@ -26,7 +28,7 @@ jobs:
 
       - name: Build release assets
         env:
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ github.event.release.tag_name }}
         run: |
           set -euo pipefail
 
@@ -75,12 +77,13 @@ jobs:
           (cd "${DIST_DIR}" && sha256sum br_* > checksums.txt)
           ls -lh "${DIST_DIR}"
 
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
-        with:
-          generate_release_notes: true
-          files: |
-            dist/*.tar.gz
-            dist/*.zip
-            dist/checksums.txt
-          fail_on_unmatched_files: true
+      - name: Upload assets to existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release upload "${TAG}" \
+            dist/*.tar.gz \
+            dist/*.zip \
+            dist/checksums.txt \
+            --clobber
