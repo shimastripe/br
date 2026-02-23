@@ -1,0 +1,4 @@
+interface:
+  display_name: "br development"
+  short_description: "Implement and maintain the br CLI"
+  default_prompt: "Use $br-development to implement or evolve a Go Bitrise CLI with auth, generic API mode, and OpenAPI-generated commands."

@@ -1,9 +1,9 @@
 ---
-name: bitrise-ghlike-cli-go
+name: br-development
 description: Implement and maintain a gh-like Bitrise CLI in Go using Cobra, including token authentication (`auth login/status/logout`), generic REST execution (`api` with gh-style flags), and OpenAPI-driven tag command generation from Bitrise Swagger while excluding deprecated endpoints. Use when building new Bitrise CLI features, updating API coverage from spec changes, or debugging command/auth/http behavior.
 ---
 
-# Bitrise GH-like CLI (Go)
+# br Development
 
 Use this skill to keep the CLI architecture consistent while adding or modifying Bitrise commands.
 
@@ -68,7 +68,7 @@ make test
 GOCACHE=/tmp/go-build GOMODCACHE=/tmp/gomodcache go build -o bin/br ./cmd/br
 ./bin/br --help
 ./bin/br auth login --help
-./bin/br addons list --help
+./bin/br builds list --help
 ```
 
 ## Debugging Checklist

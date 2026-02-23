@@ -1,0 +1,4 @@
+interface:
+  display_name: "br usage"
+  short_description: "Use br for app/build/pipeline operations"
+  default_prompt: "Use $br-usage to operate the br CLI for common Bitrise tasks, output formatting, and generic API calls."

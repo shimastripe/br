@@ -71,7 +71,7 @@
 
 - Login with token arg persists token after validation.
 - Login via stdin behaves identically.
-- Generated command (e.g. `addons list`) hits expected path and method.
+- Generated command (e.g. `builds list`) hits expected path and method.
 - `br api -X PATCH ... -f ... -H ...` sends expected method/body/header.
 - Non-2xx responses return non-zero and print error payload.
 - Pagination + slurp returns aggregated JSON array.

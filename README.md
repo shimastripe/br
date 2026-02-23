@@ -8,6 +8,7 @@ A gh-like CLI for Bitrise written in Go.
 - Generic REST execution via `br api` (works for unsupported/new endpoints too)
 - Token login via `br auth login --with-token` (supports argument and stdin)
 - Built-in command and option help via `help` / `--help`
+- Includes a reusable Agent Skill for day-to-day CLI usage
 
 ## Installation
 
@@ -20,6 +21,32 @@ mise use github:shimastripe/br@latest
 ### Binary
 
 Prebuilt binaries are available in the GitHub [Release Notes](https://github.com/shimastripe/br/releases).
+
+## Agent Skills
+
+If you want command usage guidance, install this Agent Skill:
+
+- CLI usage (recommended): `skills/br-usage`
+
+```bash
+npx skills add shimastripe/br
+```
+
+Optional (for maintainers implementing `br` itself):
+
+- CLI development/maintenance: `skills/br-development`
+
+```bash
+npx skills add shimastripe/br --skill br-development -a codex -g -y
+```
+
+For non-interactive installs of the usage skill:
+
+```bash
+npx skills add shimastripe/br --skill br-usage -a codex -g -y
+```
+
+After installation, restart Codex.
 
 ## Main Commands
 
