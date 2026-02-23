@@ -21,6 +21,37 @@ mise use github:shimastripe/br@latest
 
 Prebuilt binaries are available in the GitHub [Release Notes](https://github.com/shimastripe/br/releases).
 
+## Main Commands
+
+```bash
+br auth login --with-token <TOKEN>
+br auth login --with-token < token.txt
+br auth status
+br auth logout
+
+br api /apps/{app-slug}/builds -X GET
+br api /apps/{app-slug}/builds -X POST -f branch=main
+br api /apps/{app-slug}/builds --paginate --slurp
+
+br addons list
+br builds trigger --app-slug <app-slug> -f branch=main
+
+# GET commands default to table output
+br addons list
+
+# switch back to raw JSON output
+br addons list --format json
+
+# select only specific fields in JSON output
+br addons list --format json --fields id,title
+
+# show available fields in help
+br addons list --help
+
+# format selected JSON using a Go template
+br addons list --format json --fields id,title --template '{{range .}}{{.id}} {{.title}}{{"\n"}}{{end}}'
+```
+
 ## Shell Completion
 
 Generate shell completion scripts with `br completion <shell>`.
@@ -59,37 +90,6 @@ br completion fish > ~/.config/fish/completions/br.fish
 
 ```powershell
 br completion powershell | Out-String | Invoke-Expression
-```
-
-## Main Commands
-
-```bash
-br auth login --with-token <TOKEN>
-br auth login --with-token < token.txt
-br auth status
-br auth logout
-
-br api /apps/{app-slug}/builds -X GET
-br api /apps/{app-slug}/builds -X POST -f branch=main
-br api /apps/{app-slug}/builds --paginate --slurp
-
-br addons list
-br builds trigger --app-slug <app-slug> -f branch=main
-
-# GET commands default to table output
-br addons list
-
-# switch back to raw JSON output
-br addons list --format json
-
-# select only specific fields in JSON output
-br addons list --format json --fields id,title
-
-# show available fields in help
-br addons list --help
-
-# format selected JSON using a Go template
-br addons list --format json --fields id,title --template '{{range .}}{{.id}} {{.title}}{{"\n"}}{{end}}'
 ```
 
 ## Credential Storage
