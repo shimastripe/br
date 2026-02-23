@@ -22,32 +22,6 @@ mise use github:shimastripe/br@latest
 
 Prebuilt binaries are available in the GitHub [Release Notes](https://github.com/shimastripe/br/releases).
 
-## Agent Skills
-
-If you want command usage guidance, install this Agent Skill:
-
-- CLI usage (recommended): `skills/br-usage`
-
-```bash
-npx skills add shimastripe/br
-```
-
-Optional (for maintainers implementing `br` itself):
-
-- CLI development/maintenance: `skills/br-development`
-
-```bash
-npx skills add shimastripe/br --skill br-development -a codex -g -y
-```
-
-For non-interactive installs of the usage skill:
-
-```bash
-npx skills add shimastripe/br --skill br-usage -a codex -g -y
-```
-
-After installation, restart Codex.
-
 ## Main Commands
 
 ```bash
@@ -122,6 +96,32 @@ br completion fish > ~/.config/fish/completions/br.fish
 ```powershell
 br completion powershell | Out-String | Invoke-Expression
 ```
+
+## Agent Skills
+
+If you want command usage guidance, install this Agent Skill:
+
+- CLI usage (recommended): `skills/br-usage`
+
+```bash
+npx skills add shimastripe/br
+```
+
+Optional (for maintainers implementing `br` itself):
+
+- CLI development/maintenance: `skills/br-development`
+
+```bash
+npx skills add shimastripe/br --skill br-development -a codex -g -y
+```
+
+For non-interactive installs of the usage skill:
+
+```bash
+npx skills add shimastripe/br --skill br-usage -a codex -g -y
+```
+
+After installation, restart Codex.
 
 ## Credential Storage
 
