@@ -4,7 +4,7 @@ A gh-like CLI for Bitrise written in Go.
 
 ## Features
 
-- Auto-generated tag-based commands like `br addons ...`
+- Auto-generated tag-based commands like `br application ...`, `br builds ...`, and `br pipelines ...`
 - Generic REST execution via `br api` (works for unsupported/new endpoints too)
 - Token login via `br auth login --with-token` (supports argument and stdin)
 - Built-in command and option help via `help` / `--help`
@@ -33,23 +33,27 @@ br api /apps/{app-slug}/builds -X GET
 br api /apps/{app-slug}/builds -X POST -f branch=main
 br api /apps/{app-slug}/builds --paginate --slurp
 
-br addons list
+# app / builds / pipelines commands
+br application app-list
+br application app-show --app-slug <app-slug>
+br builds list --app-slug <app-slug>
+br pipelines list --app-slug <app-slug>
 br builds trigger --app-slug <app-slug> -f branch=main
 
 # GET commands default to table output
-br addons list
+br builds list --app-slug <app-slug>
 
 # switch back to raw JSON output
-br addons list --format json
+br builds list --app-slug <app-slug> --format json
 
 # select only specific fields in JSON output
-br addons list --format json --fields id,title
+br builds list --app-slug <app-slug> --format json --fields slug,status,triggered_workflow
 
 # show available fields in help
-br addons list --help
+br builds list --help
 
 # format selected JSON using a Go template
-br addons list --format json --fields id,title --template '{{range .}}{{.id}} {{.title}}{{"\n"}}{{end}}'
+br builds list --app-slug <app-slug> --format json --fields slug,status --template '{{range .}}{{.slug}} {{.status}}{{"\n"}}{{end}}'
 ```
 
 ## Shell Completion
