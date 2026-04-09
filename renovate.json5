@@ -13,6 +13,8 @@
     "github-actions",
   ],
 
+  minimumReleaseAge: "7 days",
+  internalChecksFilter: "strict",
   rangeStrategy: "replace",
   dependencyDashboard: true,
   rebaseWhen: "behind-base-branch",
