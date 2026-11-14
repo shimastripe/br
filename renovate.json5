@@ -11,8 +11,11 @@
   enabledManagers: [
     "gomod",
     "github-actions",
+    "custom.regex",
   ],
 
+  minimumReleaseAge: "7 days",
+  internalChecksFilter: "strict",
   rangeStrategy: "replace",
   dependencyDashboard: true,
   rebaseWhen: "behind-base-branch",
@@ -46,5 +49,19 @@
       groupName: "go indirect dependencies",
       commitMessageTopic: "go indirect dependencies",
     },
+  ],
+
+  customManagers: [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "gh extension install github/gh-actions-lock --pin (?<currentValue>[^\\s\"']+)"
+      ],
+      "depNameTemplate": "github/gh-actions-lock",
+      "datasourceTemplate": "github-releases"
+    }
   ],
 }
